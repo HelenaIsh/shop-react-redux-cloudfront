@@ -1,7 +1,6 @@
 import { Construct } from "constructs";
 import {
   aws_cloudfront,
-  aws_cloudfront_origins,
   aws_s3,
   aws_s3_deployment,
   CfnOutput,
@@ -13,35 +12,18 @@ export class DeploymentService extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    const hostingBucket = new aws_s3.Bucket(this, "FrontendBucket", {
-      blockPublicAccess: aws_s3.BlockPublicAccess.BLOCK_ALL,
-    });
+    const hostingBucket = aws_s3.Bucket.fromBucketName(
+      this,
+      "FrontendBucket",
+      "deploywebappstack-deploymentfrontendbucket67ceb713-ojkquh3fr41s",
+    );
 
-    const distribution = new aws_cloudfront.Distribution(
+    const distribution = aws_cloudfront.Distribution.fromDistributionAttributes(
       this,
       "CloudfrontDistribution",
       {
-        defaultBehavior: {
-          origin:
-            aws_cloudfront_origins.S3BucketOrigin.withOriginAccessControl(
-              hostingBucket,
-            ),
-          viewerProtocolPolicy:
-            aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-        },
-        defaultRootObject: "index.html",
-        errorResponses: [
-          {
-            httpStatus: 403,
-            responseHttpStatus: 200,
-            responsePagePath: "/index.html",
-          },
-          {
-            httpStatus: 404,
-            responseHttpStatus: 200,
-            responsePagePath: "/index.html",
-          },
-        ],
+        distributionId: "E3TYCBHV70BDZR",
+        domainName: "di3bvpq1652st.cloudfront.net",
       },
     );
 
@@ -53,7 +35,7 @@ export class DeploymentService extends Construct {
     });
 
     new CfnOutput(this, "CloudFrontURL", {
-      value: distribution.domainName,
+      value: distribution.distributionDomainName,
       description: "The distribution URL",
       exportName: "CloudfrontURL",
     });
